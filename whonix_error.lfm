@@ -7,6 +7,7 @@ object ErrorForm: TErrorForm
   Caption = 'Error'
   ClientHeight = 600
   ClientWidth = 600
+  OnCreate = FormCreate
   OnHide = FormHide
   LCLVersion = '2.2.0.4'
   object ButtonErrorOK: TButton

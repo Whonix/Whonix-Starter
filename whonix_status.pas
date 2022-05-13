@@ -26,17 +26,19 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, StdCtrls,
-  Arrow;
+  Arrow, ExtCtrls;
 
 type
 
   { TStatusForm }
 
   TStatusForm = class(TForm)
+    ButtonClose: TButton;
     CheckBoxOutput: TCheckBox;
-    LabelStatus: TLabel;
     MemoOutput: TMemo;
+    PanelStatus: TPanel;
     ProgressBar: TProgressBar;
+    procedure ButtonCloseClick(Sender: TObject);
     procedure CheckBoxOutputChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
@@ -68,8 +70,14 @@ begin
   end;
 end;
 
+procedure TStatusForm.ButtonCloseClick(Sender: TObject);
+begin
+  Close;
+end;
+
 procedure TStatusForm.FormCreate(Sender: TObject);
 begin
+  StatusForm.Icon.LoadFromResourceName(Hinstance,'MAINICON');
   MemoOutput.Hide;
   StatusForm.Height := CheckBoxOutput.Top + CheckBoxOutput.Height + 10;
 end;
@@ -83,7 +91,7 @@ begin
     StatusForm.Show;
   end;
 
-  LabelStatus.Caption := 'Status: ' + Status;
+  PanelStatus.Caption := 'Status: ' + Status;
   MemoOutput.Append('Status:' + Status);
 
   if Output <> nil then

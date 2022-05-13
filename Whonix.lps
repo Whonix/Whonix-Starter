@@ -19,7 +19,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Whonix_Main"/>
         <EditorIndex Value="4"/>
-        <CursorPos X="22" Y="29"/>
+        <TopLine Value="123"/>
+        <CursorPos X="43" Y="137"/>
         <UsageCount Value="104"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -31,9 +32,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Whonix_Error"/>
-        <EditorIndex Value="6"/>
-        <TopLine Value="23"/>
-        <CursorPos X="100" Y="12"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="29"/>
+        <CursorPos X="63" Y="62"/>
         <UsageCount Value="104"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -52,9 +53,8 @@
         <Filename Value="whonixutils.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="WhonixUtils"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="74"/>
+        <TopLine Value="79"/>
         <CursorPos X="70" Y="95"/>
         <UsageCount Value="87"/>
         <Loaded Value="True"/>
@@ -68,7 +68,7 @@
         <UnitName Value="Whonix_License"/>
         <EditorIndex Value="3"/>
         <TopLine Value="33"/>
-        <CursorPos X="87" Y="47"/>
+        <CursorPos X="6" Y="59"/>
         <UsageCount Value="87"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -80,9 +80,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Whonix_Status"/>
-        <EditorIndex Value="5"/>
-        <TopLine Value="66"/>
-        <CursorPos X="80" Y="8"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="68"/>
+        <CursorPos X="9" Y="75"/>
         <UsageCount Value="48"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -231,8 +232,16 @@
         <CursorPos X="14" Y="24"/>
         <UsageCount Value="10"/>
       </Unit>
+      <Unit>
+        <Filename Value="/usr/share/lazarus/2.2.0/lcl/include/icon.inc"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="663"/>
+        <CursorPos Y="684"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
     </Units>
-    <JumpHistory HistoryIndex="21">
+    <JumpHistory HistoryIndex="29">
       <Position>
         <Filename Value="whonixutils.pas"/>
         <Caret Line="60" Column="22" TopLine="39"/>
@@ -320,6 +329,38 @@
       <Position>
         <Filename Value="whonix_main.pas"/>
         <Caret Line="133" Column="76" TopLine="116"/>
+      </Position>
+      <Position>
+        <Filename Value="whonix_main.pas"/>
+        <Caret Line="138" Column="71" TopLine="126"/>
+      </Position>
+      <Position>
+        <Filename Value="whonix_main.pas"/>
+        <Caret Line="202" Column="59" TopLine="164"/>
+      </Position>
+      <Position>
+        <Filename Value="whonix_main.pas"/>
+        <Caret Line="205" Column="9" TopLine="167"/>
+      </Position>
+      <Position>
+        <Filename Value="whonix_status.pas"/>
+        <Caret Line="72" Column="6" TopLine="47"/>
+      </Position>
+      <Position>
+        <Filename Value="whonix_status.pas"/>
+        <Caret Line="73" Column="6" TopLine="48"/>
+      </Position>
+      <Position>
+        <Filename Value="whonix_status.pas"/>
+        <Caret Line="72" Column="6" TopLine="47"/>
+      </Position>
+      <Position>
+        <Filename Value="whonix_status.pas"/>
+        <Caret Line="73" Column="6" TopLine="48"/>
+      </Position>
+      <Position>
+        <Filename Value="whonix_status.pas"/>
+        <Caret Line="97" Column="18" TopLine="68"/>
       </Position>
     </JumpHistory>
     <RunParams>

@@ -1,7 +1,7 @@
 object StatusForm: TStatusForm
-  Left = 233
+  Left = 243
   Height = 398
-  Top = 128
+  Top = 156
   Width = 563
   Caption = 'Status'
   ClientHeight = 398
@@ -19,19 +19,10 @@ object StatusForm: TStatusForm
     Style = pbstMarquee
     TabOrder = 0
   end
-  object LabelStatus: TLabel
-    Left = 10
-    Height = 17
-    Top = 50
-    Width = 543
-    Align = alTop
-    BorderSpacing.Around = 10
-    Caption = 'Status: waiting'
-  end
   object MemoOutput: TMemo
     Left = 10
-    Height = 278
-    Top = 110
+    Height = 265
+    Top = 123
     Width = 543
     Align = alClient
     BorderSpacing.Around = 10
@@ -46,12 +37,37 @@ object StatusForm: TStatusForm
   object CheckBoxOutput: TCheckBox
     Left = 10
     Height = 23
-    Top = 77
+    Top = 90
     Width = 543
     Align = alTop
     BorderSpacing.Around = 10
     Caption = 'show full output'
     OnChange = CheckBoxOutputChange
     TabOrder = 2
+  end
+  object PanelStatus: TPanel
+    Left = 10
+    Height = 30
+    Top = 50
+    Width = 543
+    Align = alTop
+    Alignment = taLeftJustify
+    BorderSpacing.Around = 10
+    BevelOuter = bvNone
+    Caption = 'Status: waiting'
+    ClientHeight = 30
+    ClientWidth = 543
+    TabOrder = 3
+    object ButtonClose: TButton
+      Left = 444
+      Height = 30
+      Top = 0
+      Width = 99
+      Align = alRight
+      Caption = 'Close'
+      Enabled = False
+      OnClick = ButtonCloseClick
+      TabOrder = 0
+    end
   end
 end

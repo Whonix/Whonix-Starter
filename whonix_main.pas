@@ -37,6 +37,7 @@ type
     ButtonAdvanced: TButton;
     procedure ButtonAdvancedClick(Sender: TObject);
     procedure ButtonStartStopClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
 
@@ -133,6 +134,7 @@ begin
   if StatusForm.Showing then
   begin
     StatusForm.ProgressBar.Style := pbstNormal;
+    StatusForm.ButtonClose.Enabled := True;
     StatusForm.NextStatus('finnished: you can close this window');
   end;
 
@@ -194,6 +196,11 @@ begin
     ProcessB.Execute;
     ButtonStartStop.Caption := 'Start Whonix';
   end;
+end;
+
+procedure TMainForm.FormCreate(Sender: TObject);
+begin
+  MainForm.Icon.LoadFromResourceName(Hinstance, 'MAINICON');
 end;
 
 end.

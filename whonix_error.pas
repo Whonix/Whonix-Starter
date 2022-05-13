@@ -35,6 +35,7 @@ type
     ButtonErrorOK: TButton;
     MemoError: TMemo;
     procedure ButtonErrorOKClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
     procedure FormHide(Sender: TObject);
   private
 
@@ -54,6 +55,11 @@ implementation
 procedure TErrorForm.ButtonErrorOKClick(Sender: TObject);
 begin
   Halt;
+end;
+
+procedure TErrorForm.FormCreate(Sender: TObject);
+begin
+  ErrorForm.Icon.LoadFromResourceName(Hinstance,'MAINICON');
 end;
 
 procedure TErrorForm.FormHide(Sender: TObject);

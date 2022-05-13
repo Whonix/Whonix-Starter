@@ -57,6 +57,7 @@ implementation
 
 procedure TLicenseForm.FormCreate(Sender: TObject);
 begin
+  LicenseForm.Icon.LoadFromResourceName(Hinstance,'MAINICON');
   MemoLicense.Lines.LoadFromFile(ExtractFilePath(Application.ExeName) + 'license.txt');
 end;
 
