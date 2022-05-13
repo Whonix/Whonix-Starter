@@ -1,7 +1,7 @@
 (*
  * Whonix Starter ( Whonix.lpr )
  *
- * Copyright: 2012 - 2019 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
+ * Copyright: 2012 - 2022 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
  * Author: einsiedler90@protonmail.com
  * License: GPL-3+-with-additional-terms-1
  * This program is free software: you can redistribute it and/or modify
@@ -23,11 +23,11 @@ program Whonix;
 {$mode objfpc}{$H+}
 
 uses
- {$IFDEF UNIX}
+  {$IFDEF UNIX}
   cthreads,
-       {$ENDIF} {$IFDEF HASAMIGA}
+  {$ENDIF} {$IFDEF HASAMIGA}
   athreads,
-       {$ENDIF}
+  {$ENDIF}
   SysUtils,
   Interfaces, // this includes the LCL widgetset
   Forms,

@@ -1,7 +1,7 @@
 (*
  * Whonix Starter ( whonix_status.pas )
  *
- * Copyright: 2012 - 2019 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
+ * Copyright: 2012 - 2022 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
  * Author: einsiedler90@protonmail.com
  * License: GPL-3+-with-additional-terms-1
  * This program is free software: you can redistribute it and/or modify
@@ -42,7 +42,7 @@ type
   private
 
   public
-    procedure NextStatus(Status: String; Output: TStrings = nil);
+    procedure NextStatus(Status: string; Output: TStrings = nil);
   end;
 
 var
@@ -56,10 +56,13 @@ implementation
 
 procedure TStatusForm.CheckBoxOutputChange(Sender: TObject);
 begin
-  if CheckBoxOutput.Checked then begin
+  if CheckBoxOutput.Checked then
+  begin
     StatusForm.Height := 500;
     MemoOutput.Show;
-  end else begin
+  end
+  else
+  begin
     MemoOutput.Hide;
     StatusForm.Height := CheckBoxOutput.Top + CheckBoxOutput.Height + 10;
   end;
@@ -71,14 +74,22 @@ begin
   StatusForm.Height := CheckBoxOutput.Top + CheckBoxOutput.Height + 10;
 end;
 
-procedure TStatusForm.NextStatus(Status: String; Output: TStrings = nil);
-var i: Integer;
+procedure TStatusForm.NextStatus(Status: string; Output: TStrings = nil);
+var
+  i: integer;
 begin
+  if not StatusForm.Showing then
+  begin
+    StatusForm.Show;
+  end;
+
   LabelStatus.Caption := 'Status: ' + Status;
   MemoOutput.Append('Status:' + Status);
 
-  if Output <> nil then begin
-    for i := 0 to Output.Count -1 do begin
+  if Output <> nil then
+  begin
+    for i := 0 to Output.Count - 1 do
+    begin
       MemoOutput.Append(Output.Strings[i]);
     end;
   end;
@@ -86,11 +97,11 @@ begin
   MemoOutput.Lines.SaveToFile(GetAppConfigDir(False) + 'Whonix.log');
 
   // wait 2 seconds to make status reading possible
-  for i := 1 to 20 do begin
+  for i := 1 to 20 do
+  begin
     Sleep(100);
     Application.ProcessMessages;
   end;
 end;
 
 end.
-

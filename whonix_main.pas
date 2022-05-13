@@ -1,7 +1,7 @@
 (*
  * Whonix Starter ( whonix_main.pas )
  *
- * Copyright: 2012 - 2019 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
+ * Copyright: 2012 - 2022 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
  * Author: einsiedler90@protonmail.com
  * License: GPL-3+-with-additional-terms-1
  * This program is free software: you can redistribute it and/or modify
@@ -25,8 +25,8 @@ unit Whonix_Main;
 interface
 
 uses
-  Classes, SysUtils, StrUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Process,
-  WhonixAppConfig, WhonixUtils;
+  Classes, SysUtils, StrUtils, Forms, Controls, Graphics, Dialogs, StdCtrls,
+  ComCtrls, Process, WhonixAppConfig, WhonixUtils;
 
 type
 
@@ -70,16 +70,14 @@ begin
     SaveWhonixAppConfig;
   end;
 
-  StatusForm.Show;
-
   {$IFDEF WINDOWS}
   if (AppConfig.VirtualBoxPath = '') or (AppConfig.VBoxManagePath = '') then
   begin
     StatusForm.NextStatus('step 1/4: execute virtualbox installer');
-    RunAsAdmin(MainForm.Handle, ExtractFilePath(Application.ExeName) +
-      'vbox.exe', '--silent --ignore-reboot', StatusForm.MemoOutput.Lines);
-    //Execute('cmd.exe /c ""' + ExtractFilePath(Application.ExeName) +
-    //  'vbox.exe"" --silent --ignore-reboot', StatusForm.MemoOutput.Lines);
+    //RunAsAdmin(MainForm.Handle, ExtractFilePath(Application.ExeName) +
+    //  'vbox.exe', '--silent --ignore-reboot', StatusForm.MemoOutput.Lines);
+    Execute('cmd.exe /c ""' + ExtractFilePath(Application.ExeName) +
+      'vbox.exe"" --silent --ignore-reboot', StatusForm.MemoOutput.Lines);
 
     StatusForm.NextStatus('step 2/4: reload whonix application config');
     LoadWhonixAppConfig;
@@ -88,37 +86,61 @@ begin
 
   if (AppConfig.VirtualBoxPath = '') or (AppConfig.VBoxManagePath = '') then
   begin
-    StatusForm.Hide;
     ErrorForm.MemoError.Lines.Text := 'VirtualBox or VBoxManage not found';
     ErrorForm.ShowModal;
   end;
 
-  StatusForm.NextStatus('step 3/4: install whonix gateway and workstation');
   Output := TStringList.Create;
   Execute(AppConfig.VBoxManagePath + ' list vms', Output);
   StatusForm.MemoOutput.Lines.AddStrings(Output);
-
   ova_path := ExtractFilePath(Application.ExeName) + 'Whonix.ova';
-  if FileExists(ova_path) and not ContainsStr(Output.Text, 'Whonix-Gateway-XFCE') and
-    not ContainsStr(Output.Text, 'Whonix-Workstation-XFCE') then
-  begin
-    Execute(AppConfig.VBoxManagePath + ' import "' + ova_path +
-      '" --vsys 0 --eula accept --vsys 1 --eula accept', StatusForm.MemoOutput.Lines);
-  end;
+  StatusForm.MemoOutput.Append('Info: OVA-Path=' + ova_path);
 
-  {$IFDEF WINDOWS}
-  if FileExists(AppConfig.MsiInstallerPath)
-    and (ExtractFileName(AppConfig.MsiInstallerPath) = 'Whonix.msi') then
+  if not ContainsStr(Output.Text, 'Whonix-Gateway-XFCE') and not
+    ContainsStr(Output.Text, 'Whonix-Workstation-XFCE') then
   begin
-    StatusForm.NextStatus('step 4/4: remove whonix ova from install dir');
-    Execute('msiexec /i "' + AppConfig.MsiInstallerPath + '" REMOVE="Data"',
-      StatusForm.MemoOutput.Lines);
+    StatusForm.NextStatus('step 3/4: install whonix gateway and workstation');
+    if FileExists(ova_path) then
+    begin
+      Execute(AppConfig.VBoxManagePath + ' import "' + ova_path +
+        '" --vsys 0 --eula accept --vsys 1 --eula accept', StatusForm.MemoOutput.Lines);
+    end
+    else
+    begin
+      StatusForm.MemoOutput.Append('Warning: Whonix.ova not found!');
+    end;
   end;
-  {$ENDIF}
 
   Output.Free;
 
-  StatusForm.Hide;
+  {$IFDEF WINDOWS}
+  if FileExists(ova_path) then begin
+    if FileExists(AppConfig.MsiInstallerPath) then
+    begin
+      StatusForm.NextStatus('step 4/4: remove whonix ova from install dir');
+      Execute('msiexec /i "' + AppConfig.MsiInstallerPath + '" REMOVE="Data"',
+        StatusForm.MemoOutput.Lines);
+    end
+    else
+    begin
+      StatusForm.MemoOutput.Append('Warning: cannot remove Whonix.ova!');
+      StatusForm.MemoOutput.Append('Use: msiexec /i "' +
+        AppConfig.MsiInstallerPath + '" REMOVE="Data"');
+    end;
+  end;
+  {$ENDIF}
+
+  if StatusForm.Showing then
+  begin
+    StatusForm.ProgressBar.Style := pbstNormal;
+    StatusForm.NextStatus('finnished: you can close this window');
+  end;
+
+  while StatusForm.Showing do
+  begin
+    Sleep(10);
+    Application.ProcessMessages;
+  end;
 end;
 
 procedure TMainForm.ButtonAdvancedClick(Sender: TObject);
@@ -127,7 +149,7 @@ var
 begin
   if not FileExists(AppConfig.VirtualBoxPath) then
   begin
-    ErrorForm.MemoError.Lines.Text := 'binary VirtualBox not found';
+    ErrorForm.MemoError.Lines.Text := 'binary "VirtualBox" not found';
     ErrorForm.ShowModal;
   end;
 
@@ -143,7 +165,7 @@ var
 begin
   if not FileExists(AppConfig.VBoxManagePath) then
   begin
-    ErrorForm.MemoError.Lines.Text := 'binary VBoxManage not found';
+    ErrorForm.MemoError.Lines.Text := 'binary "VBoxManage" not found';
     ErrorForm.ShowModal;
   end;
 

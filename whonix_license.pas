@@ -1,7 +1,7 @@
 (*
  * Whonix Starter ( whonix_license.pas )
  *
- * Copyright: 2012 - 2019 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
+ * Copyright: 2012 - 2022 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
  * Author: einsiedler90@protonmail.com
  * License: GPL-3+-with-additional-terms-1
  * This program is free software: you can redistribute it and/or modify
@@ -72,4 +72,3 @@ begin
 end;
 
 end.
-

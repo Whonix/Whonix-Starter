@@ -1,7 +1,7 @@
 (*
  * Whonix Starter ( whonixutils.pas )
  *
- * Copyright: 2012 - 2019 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
+ * Copyright: 2012 - 2022 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
  * Author: einsiedler90@protonmail.com
  * License: GPL-3+-with-additional-terms-1
  * This program is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@ uses
 procedure RunAsAdmin(const Handle: Hwnd; const Path, Params: string; Output: TStrings = nil);
 {$ENDIF}
 
-procedure Execute(CommandLine: String; Output: TStrings = nil);
+procedure Execute(CommandLine: string; Output: TStrings = nil);
 
 implementation
 
@@ -47,11 +47,11 @@ begin
   FillChar(sei, SizeOf(sei), 0);
   sei.cbSize := SizeOf(sei);
   sei.Wnd := 0; // Handle
-  sei.fMask := SEE_MASK_NOCLOSEPROCESS; //SEE_MASK_FLAG_DDEWAIT or SEE_MASK_FLAG_NO_UI;
+  sei.fMask := SEE_MASK_NOCLOSEPROCESS;
   sei.lpVerb := 'runas';
   sei.lpFile := PAnsiChar(Path);
   sei.lpParameters := PAnsiChar(Params);
-  sei.nShow := SW_SHOW; //SW_SHOWNORMAL;
+  sei.nShow := SW_SHOW;
   sei.hInstApp := 0;
 
   if Output <> nil then begin
@@ -59,7 +59,7 @@ begin
   end;
 
   if ShellExecuteExA(@sei) then begin
-    while WaitForSingleObject(sei.hProcess, 10) <> 0 do begin // INFINITE
+    while WaitForSingleObject(sei.hProcess, 10) <> 0 do begin
       Application.ProcessMessages;
     end;
     CloseHandle(sei.hProcess);
@@ -67,35 +67,49 @@ begin
 end;
 {$ENDIF}
 
-procedure Execute(CommandLine: String; Output: TStrings = nil);
+procedure Execute(CommandLine: string; Output: TStrings = nil);
 var
   Process: TProcess;
-  StrStream : TStringStream;
+  StrStream: TStringStream;
 begin
   Process := TProcess.Create(nil);
   Process.CommandLine := CommandLine;
   Process.Options := Process.Options + [poNoConsole];
 
-  if Output <> nil then begin
+  if Output <> nil then
+  begin
     Process.Options := Process.Options + [poUsePipes, poStderrToOutPut];
     Output.Append('Execute: ' + Process.CommandLine);
+    Output.Append('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
   end;
 
   Process.Execute;
 
   StrStream := TStringStream.Create;
-  repeat
-    Sleep(10);
-    Application.ProcessMessages;
 
-    while (Process.Output.NumBytesAvailable > 0) do
-    begin
-      StrStream.WriteByte(Process.Output.ReadByte);
-    end;
-  until not Process.Running;
+  try
+    repeat
+      Sleep(10);
+      Application.ProcessMessages;
 
-  if Output <> nil then begin
+      while (Process.Output.NumBytesAvailable > 0) do
+      begin
+        StrStream.WriteByte(Process.Output.ReadByte);
+      end;
+    until not Process.Running;
+  except
+    on E: Exception do
+      if Output <> nil then
+      begin
+        Output.Append('Exception: ' + E.Message);
+        Output.Append('------------------------------------------------');
+      end;
+  end;
+
+  if Output <> nil then
+  begin
     Output.Append(StrStream.DataString);
+    Output.Append('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
   end;
 
   StrStream.Free;
@@ -103,4 +117,3 @@ begin
 end;
 
 end.
-

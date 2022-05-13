@@ -15,6 +15,7 @@ object StatusForm: TStatusForm
     Width = 543
     Align = alTop
     BorderSpacing.Around = 10
+    Position = 100
     Style = pbstMarquee
     TabOrder = 0
   end
