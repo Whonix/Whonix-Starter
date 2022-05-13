@@ -68,9 +68,13 @@ end;
 {$ENDIF}
 
 procedure Execute(CommandLine: string; Output: TStrings = nil);
+const
+  BUFSIZE = 2048;
 var
   Process: TProcess;
   StrStream: TStringStream;
+  BytesRead: longint;
+  Buffer: array[1..BUFSIZE] of byte;
 begin
   Process := TProcess.Create(nil);
   Process.CommandLine := CommandLine;
@@ -80,7 +84,6 @@ begin
   begin
     Process.Options := Process.Options + [poUsePipes, poStderrToOutPut];
     Output.Append('Execute: ' + Process.CommandLine);
-    Output.Append('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
   end;
 
   Process.Execute;
@@ -92,23 +95,27 @@ begin
       Sleep(10);
       Application.ProcessMessages;
 
-      while (Process.Output.NumBytesAvailable > 0) do
+      if (Process.Output.NumBytesAvailable > BUFSIZE) or not Process.Running then
       begin
-        StrStream.WriteByte(Process.Output.ReadByte);
+        BytesRead := Process.Output.Read(Buffer, BUFSIZE);
+        StrStream.Write(Buffer, BytesRead);
       end;
-    until not Process.Running;
+    until (BytesRead = 0) and not Process.Running;
   except
     on E: Exception do
       if Output <> nil then
       begin
         Output.Append('Exception: ' + E.Message);
-        Output.Append('------------------------------------------------');
       end;
   end;
 
   if Output <> nil then
   begin
-    Output.Append(StrStream.DataString);
+    Output.Append('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+    if StrStream.Size > 0 then
+    begin
+      Output.Append(StrStream.DataString);
+    end;
     Output.Append('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
   end;
 
