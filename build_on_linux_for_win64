@@ -1,0 +1,3 @@
+#!/bin/bash
+lazbuild -B Whonix.lpr --cpu=x86_64 --os=win64 --compiler=/usr/bin/ppcrossx64
+exit 0
