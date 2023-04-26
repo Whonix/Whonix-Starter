@@ -32,7 +32,7 @@ object ErrorForm: TErrorForm
     BorderSpacing.Around = 10
     Font.Height = -37
     Lines.Strings = (
-      'You appear to execute this program from a folder which doesn''t contain the necessary files for it to operate properly. Please try reinstalling this program via the Whonix-Installer. If the program persists, please contact the developer at:'
+      'You appear to execute this program from a folder which does not contain the necessary files for it to operate properly. Please try reinstalling this program via the Whonix-Installer. If the program persists, please contact the developer at:'
       ''
       'https://forums.whonix.org'
     )
