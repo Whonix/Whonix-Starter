@@ -25,7 +25,7 @@ if ! [ -x "$(command -v lazbuild)" ]; then
   exit 1
 fi
 
-## 2) build whonix starter (Whonix.exe)
+## 2) build Whonix-Starter (Whonix.exe)
 
 lazbuild -B Whonix.lpr --cpu=x86_64 --os=win64 --compiler=/usr/bin/ppcrossx64
 
@@ -36,7 +36,7 @@ MANUFACTURE=$(xmllint --xpath 'string(//StringTable/@CompanyName)' Whonix.lpi)
 DESCRIPTION=$(xmllint --xpath 'string(//StringTable/@Comments)' Whonix.lpi)
 FILE_WHONIX_EXE=$(xmllint --xpath 'string(//StringTable/@OriginalFilename)' Whonix.lpi)
 
-## 4) build msi package for whonix starter
+## 4) build msi package for Whonix-Starter
 
 wixl \
   --verbose \
