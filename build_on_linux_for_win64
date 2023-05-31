@@ -50,4 +50,7 @@ wixl \
   --output WhonixStarterSetup.msi \
   Setup.wxs
 
+## Debugging.
+du -sh WhonixStarterSetup.msi
+
 true "$0: SUCCESS"
