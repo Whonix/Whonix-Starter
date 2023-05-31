@@ -7,8 +7,7 @@ object MainForm: TMainForm
   ClientHeight = 600
   ClientWidth = 600
   OnCreate = FormCreate
-  OnShow = FormShow
-  LCLVersion = '2.2.0.4'
+  LCLVersion = '2.2.4.0'
   object ButtonAdvanced: TButton
     Left = 10
     Height = 100

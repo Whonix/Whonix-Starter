@@ -59,7 +59,7 @@ end;
 
 procedure TErrorForm.FormCreate(Sender: TObject);
 begin
-  ErrorForm.Icon.LoadFromResourceName(Hinstance,'MAINICON');
+  ErrorForm.Icon.LoadFromResourceName(Hinstance, 'MAINICON');
 end;
 
 procedure TErrorForm.FormHide(Sender: TObject);

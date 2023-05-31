@@ -29,7 +29,9 @@ uses
     Windows, ShellApi,
   {$ENDIF}
 
-  Classes, SysUtils, Forms, Process;
+  Classes, SysUtils, Forms, Process, FileUtil;
+
+procedure EnsureValidExePath(var TargetPath: string; DefaultPath: string);
 
 {$IFDEF WINDOWS}
 procedure RunAsAdmin(const Handle: Hwnd; const Path, Params: string; Output: TStrings = nil);
@@ -38,6 +40,48 @@ procedure RunAsAdmin(const Handle: Hwnd; const Path, Params: string; Output: TSt
 procedure Execute(CommandLine: string; Output: TStrings = nil);
 
 implementation
+
+procedure EnsureValidExePath(var TargetPath: string; DefaultPath: string);
+var
+  filename: string;
+  sl: TStringList;
+begin
+  if FileExists(TargetPath) then
+  begin
+    Exit;
+  end;
+
+  if (TargetPath <> DefaultPath) and FileExists(DefaultPath) then
+  begin
+    TargetPath := DefaultPath;
+    Exit;
+  end;
+
+  filename := ExtractFileName(DefaultPath);
+  TargetPath := FindDefaultExecutablePath(filename);
+  if FileExists(TargetPath) then
+  begin
+    Exit;
+  end;
+
+  sl := TStringList.Create;
+  {$IFDEF WINDOWS}
+  Execute('where /r C:\ ' + filename, sl);
+  {$ELSE}
+  Execute('which ' + filename, sl);
+  {$ENDIF}
+
+  if (sl.Count > 0) and FileExists(sl.Strings[0]) then
+  begin
+    TargetPath := sl.Strings[0];
+  end
+  else
+  begin
+    TargetPath := '';
+  end;
+
+  sl.Free;
+end;
 
 {$IFDEF WINDOWS}
 procedure RunAsAdmin(const Handle: Hwnd; const Path, Params: string; Output: TStrings = nil);

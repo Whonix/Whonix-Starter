@@ -38,7 +38,6 @@ type
     procedure ButtonAdvancedClick(Sender: TObject);
     procedure ButtonStartStopClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure FormShow(Sender: TObject);
   private
 
   public
@@ -50,100 +49,11 @@ var
 
 implementation
 
-uses Whonix_Error, Whonix_License, Whonix_Status;
+uses Whonix_Error;
 
 {$R *.lfm}
 
 { TMainForm }
-
-procedure TMainForm.FormShow(Sender: TObject);
-var
-  ova_path: string;
-  Output: TStringList;
-begin
-  if AppConfig.ShowLicense then
-  begin
-    LicenseForm.ShowModal;
-    if AppConfig.ShowLicense then
-    begin
-      Halt;
-    end;
-    SaveWhonixAppConfig;
-  end;
-
-  {$IFDEF WINDOWS}
-  if (AppConfig.VirtualBoxPath = '') or (AppConfig.VBoxManagePath = '') then
-  begin
-    StatusForm.NextStatus('step 1/4: execute virtualbox installer');
-    //RunAsAdmin(MainForm.Handle, ExtractFilePath(Application.ExeName) +
-    //  'vbox.exe', '--silent --ignore-reboot', StatusForm.MemoOutput.Lines);
-    Execute('cmd.exe /c ""' + ExtractFilePath(Application.ExeName) +
-      'vbox.exe"" --silent --ignore-reboot', StatusForm.MemoOutput.Lines);
-
-    StatusForm.NextStatus('step 2/4: reload whonix application config');
-    LoadWhonixAppConfig;
-  end;
-  {$ENDIF}
-
-  if (AppConfig.VirtualBoxPath = '') or (AppConfig.VBoxManagePath = '') then
-  begin
-    ErrorForm.MemoError.Lines.Text := 'VirtualBox or VBoxManage not found';
-    ErrorForm.ShowModal;
-  end;
-
-  Output := TStringList.Create;
-  Execute(AppConfig.VBoxManagePath + ' list vms', Output);
-  StatusForm.MemoOutput.Lines.AddStrings(Output);
-  ova_path := ExtractFilePath(Application.ExeName) + 'Whonix.ova';
-  StatusForm.MemoOutput.Append('Info: OVA-Path=' + ova_path);
-
-  if not ContainsStr(Output.Text, 'Whonix-Gateway-XFCE') and not
-    ContainsStr(Output.Text, 'Whonix-Workstation-XFCE') then
-  begin
-    StatusForm.NextStatus('step 3/4: install whonix gateway and workstation');
-    if FileExists(ova_path) then
-    begin
-      Execute(AppConfig.VBoxManagePath + ' import "' + ova_path +
-        '" --vsys 0 --eula accept --vsys 1 --eula accept', StatusForm.MemoOutput.Lines);
-    end
-    else
-    begin
-      StatusForm.MemoOutput.Append('Warning: Whonix.ova not found!');
-    end;
-  end;
-
-  Output.Free;
-
-  {$IFDEF WINDOWS}
-  if FileExists(ova_path) then begin
-    if FileExists(AppConfig.MsiInstallerPath) then
-    begin
-      StatusForm.NextStatus('step 4/4: remove whonix ova from install dir');
-      Execute('msiexec /i "' + AppConfig.MsiInstallerPath + '" REMOVE="Data"',
-        StatusForm.MemoOutput.Lines);
-    end
-    else
-    begin
-      StatusForm.MemoOutput.Append('Warning: cannot remove Whonix.ova!');
-      StatusForm.MemoOutput.Append('Use: msiexec /i "' +
-        AppConfig.MsiInstallerPath + '" REMOVE="Data"');
-    end;
-  end;
-  {$ENDIF}
-
-  if StatusForm.Showing then
-  begin
-    StatusForm.ProgressBar.Style := pbstNormal;
-    StatusForm.ButtonClose.Enabled := True;
-    StatusForm.NextStatus('finnished: you can close this window');
-  end;
-
-  while StatusForm.Showing do
-  begin
-    Sleep(10);
-    Application.ProcessMessages;
-  end;
-end;
 
 procedure TMainForm.ButtonAdvancedClick(Sender: TObject);
 var

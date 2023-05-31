@@ -33,34 +33,16 @@ uses
   Forms,
   Dialogs,
   Controls,
-  Process,
   Whonix_Main,
-  Whonix_Error,
-  Whonix_License,
-  Whonix_Status,
-  WhonixAppConfig { you can add units after this };
+  Whonix_Error;
 
 {$R *.res}
 
-var
-  i: integer;
-  msi_path: string = '';
 begin
-  if Application.ParamCount > 0 then
-  begin
-    for i := 1 to Application.ParamCount do
-    begin
-      msi_path := msi_path + ' ' + Application.Params[i];
-    end;
-    AppConfig.MsiInstallerPath := TrimLeft(msi_path);
-  end;
-
   RequireDerivedFormResource := True;
   Application.Scaled:=True;
   Application.Initialize;
   Application.CreateForm(TMainForm, MainForm);
   Application.CreateForm(TErrorForm, ErrorForm);
-  Application.CreateForm(TLicenseForm, LicenseForm);
-  Application.CreateForm(TStatusForm, StatusForm);
   Application.Run;
 end.

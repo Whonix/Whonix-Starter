@@ -29,10 +29,8 @@ uses
 
 type
   TAppConfig = record
-    ShowLicense: boolean;
     VirtualBoxPath: string;
     VBoxManagePath: string;
-    MsiInstallerPath: string;
   end;
 
 procedure LoadWhonixAppConfig;
@@ -48,48 +46,6 @@ uses IniFiles;
 var
   ini: TIniFile;
 
-procedure EnsureValidExePath(var TargetPath: string; DefaultPath: string);
-var
-  filename: string;
-  sl: TStringList;
-begin
-  if FileExists(TargetPath) then
-  begin
-    Exit;
-  end;
-
-  if (TargetPath <> DefaultPath) and FileExists(DefaultPath) then
-  begin
-    TargetPath := DefaultPath;
-    Exit;
-  end;
-
-  filename := ExtractFileName(DefaultPath);
-  TargetPath := FindDefaultExecutablePath(filename);
-  if FileExists(TargetPath) then
-  begin
-    Exit;
-  end;
-
-  sl := TStringList.Create;
-  {$IFDEF WINDOWS}
-  Execute('where /r C:\ ' + filename, sl);
-  {$ELSE}
-  Execute('which ' + filename, sl);
-  {$ENDIF}
-
-  if (sl.Count > 0) and FileExists(sl.Strings[0]) then
-  begin
-    TargetPath := sl.Strings[0];
-  end
-  else
-  begin
-    TargetPath := '';
-  end;
-
-  sl.Free;
-end;
-
 const
   {$IFDEF WINDOWS}
   defaultVirtualBoxPath = 'C:\Program Files\Oracle\VirtualBox\VirtualBox.exe';
@@ -97,11 +53,11 @@ const
   {$ELSE}
   defaultVirtualBoxPath = '/usr/bin/VirtualBox';
   defaultVBoxManagePath = '/usr/bin/VBoxManage';
+
   {$ENDIF}
 
 procedure LoadWhonixAppConfig;
 begin
-  AppConfig.ShowLicense := ini.ReadBool('AppConfig', 'ShowLicense', True);
   AppConfig.VirtualBoxPath := ini.ReadString('AppConfig', 'VirtualBoxPath',
     defaultVirtualBoxPath);
   AppConfig.VBoxManagePath := ini.ReadString('AppConfig', 'VBoxManagePath',
@@ -113,7 +69,6 @@ end;
 
 procedure SaveWhonixAppConfig;
 begin
-  ini.WriteBool('AppConfig', 'ShowLicense', AppConfig.ShowLicense);
   ini.WriteString('AppConfig', 'VirtualBoxPath', AppConfig.VirtualBoxPath);
   ini.WriteString('AppConfig', 'VBoxManagePath', AppConfig.VBoxManagePath);
 end;

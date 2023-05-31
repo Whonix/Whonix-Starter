@@ -15,9 +15,7 @@
     </General>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
-      <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="2"/>
-      <BuildNr Value="31"/>
       <Attributes pvaDebug="True"/>
       <StringTable Comments="Whonix-UI" CompanyName="ENCRYPTED SUPPORT LP" FileDescription="Whonix-UI" InternalName="Whonix" LegalCopyright="Copyright © 2022" OriginalFilename="Whonix.exe" ProductName="Whonix-UI" ProductVersion="2.0.0"/>
     </VersionInfo>
@@ -67,22 +65,6 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="WhonixUtils"/>
       </Unit>
-      <Unit>
-        <Filename Value="whonix_license.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="LicenseForm"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-        <UnitName Value="Whonix_License"/>
-      </Unit>
-      <Unit>
-        <Filename Value="whonix_status.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="StatusForm"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-        <UnitName Value="Whonix_Status"/>
-      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -94,6 +76,10 @@
       <IncludeFiles Value="$(ProjOutDir)"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
+    <CodeGeneration>
+      <TargetCPU Value="x86_64"/>
+      <TargetOS Value="linux"/>
+    </CodeGeneration>
     <Linking>
       <Debugging>
         <DebugInfoType Value="dsDwarf2"/>
@@ -106,17 +92,4 @@
       </Options>
     </Linking>
   </CompilerOptions>
-  <Debugging>
-    <Exceptions>
-      <Item>
-        <Name Value="EAbort"/>
-      </Item>
-      <Item>
-        <Name Value="ECodetoolError"/>
-      </Item>
-      <Item>
-        <Name Value="EFOpenError"/>
-      </Item>
-    </Exceptions>
-  </Debugging>
 </CONFIG>

@@ -1,7 +1,7 @@
 object ErrorForm: TErrorForm
-  Left = 313
+  Left = 325
   Height = 600
-  Top = 110
+  Top = 198
   Width = 600
   BorderStyle = bsDialog
   Caption = 'Error'
@@ -9,7 +9,7 @@ object ErrorForm: TErrorForm
   ClientWidth = 600
   OnCreate = FormCreate
   OnHide = FormHide
-  LCLVersion = '2.2.0.4'
+  LCLVersion = '2.2.4.0'
   object ButtonErrorOK: TButton
     Left = 10
     Height = 100
