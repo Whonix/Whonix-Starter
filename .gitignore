@@ -3,6 +3,7 @@ Whonix
 license.txt
 Whonix.ova
 vbox.exe
+*.msi
 
 
 # Lazarus compiler-generated binaries (safe to delete)

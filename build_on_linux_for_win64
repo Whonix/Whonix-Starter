@@ -3,4 +3,42 @@
 set -x
 set -e
 
+## 1) sanity tests
+
+if ! [ -x "$(command -v wixl)" ]; then
+  echo "$0: ERROR: wixl is not installed." >&2
+  exit 1
+fi
+
+if ! [ -x "$(command -v xmllint)" ]; then
+  echo "$0: ERROR: xmllint is not installed." >&2
+  exit 1
+fi
+
+if ! [ -x "$(command -v lazbuild)" ]; then
+  echo "$0: ERROR: lazbuild is not installed." >&2
+  exit 1
+fi
+
+## 2) build whonix starter (Whonix.exe)
+
 lazbuild -B Whonix.lpr --cpu=x86_64 --os=win64 --compiler=/usr/bin/ppcrossx64
+
+## 3) read values from xml file Whonix.lpi
+
+VERSION=$(xmllint --xpath 'string(//StringTable/@ProductVersion)' Whonix.lpi)
+MANUFACTURE=$(xmllint --xpath 'string(//StringTable/@CompanyName)' Whonix.lpi)
+DESCRIPTION=$(xmllint --xpath 'string(//StringTable/@Comments)' Whonix.lpi)
+FILE_WHONIX_EXE=$(xmllint --xpath 'string(//StringTable/@OriginalFilename)' Whonix.lpi)
+
+## 4) build msi package for whonix starter
+
+wixl \
+  --verbose \
+  --arch x64 \
+  --define whonixVersion="$VERSION" \
+  --define whonixManufacturer="$MANUFACTURE" \
+  --define whonixDescription="$DESCRIPTION" \
+  --define whonixFileMainExe="$FILE_WHONIX_EXE" \
+  --output WhonixStarterSetup.msi \
+  Setup.wxs
