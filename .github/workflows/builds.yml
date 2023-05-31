@@ -1,0 +1,40 @@
+name: docker build
+on: push
+
+jobs:
+    build:
+        runs-on: ubuntu-22.04
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - image: debian:testing
+                    #- image: debian:stable ## TODO
+
+        container:
+            image: ${{ matrix.image }}
+
+        steps:
+            - uses: actions/checkout@v3
+            - name: System Basic Packages
+              run: |
+                  apt-get update
+                  apt-get install --yes --no-install-recommends adduser shellcheck wixl fpc lazarus git
+            - name: System information
+              run: |
+                  whoami
+                  cat /etc/os-release
+                  uname -a
+                  echo "${PATH}"
+            - name: Create regular (non-root) user
+              run: adduser --gecos "" --disabled-password user
+            - name: Linux user file permissions fix
+              run: chown --recursive user:user /__w/Whonix-Installer
+            - name: ppcross_install
+              run: ./ppcross_install all
+            - name: Build Starter
+              run: su -s /bin/bash user -- ./build_on_linux_for_win64
+            - name: ShellCheck
+              run: shellcheck ./build_on_linux_for_win64
+
+# vim: sw=4
