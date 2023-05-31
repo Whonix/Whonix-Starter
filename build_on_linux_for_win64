@@ -2,6 +2,8 @@
 
 set -x
 set -e
+set -o pipefail
+set -o nounset
 
 ## 1) sanity tests
 
