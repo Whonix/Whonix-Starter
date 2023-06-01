@@ -1,0 +1,54 @@
+#!/bin/bash
+
+## Copyright (C) 2023 - 2023 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
+## See the file COPYING for copying conditions.
+
+set -x
+set -e
+set -o pipefail
+set -o nounset
+
+true "$0: START"
+
+## 1) sanity tests
+
+if ! [ -x "$(command -v wixl)" ]; then
+  echo "$0: ERROR: wixl is not installed." >&2
+  exit 1
+fi
+
+if ! [ -x "$(command -v xmllint)" ]; then
+  echo "$0: ERROR: xmllint is not installed." >&2
+  exit 1
+fi
+
+if ! [ -x "$(command -v lazbuild)" ]; then
+  echo "$0: ERROR: lazbuild is not installed." >&2
+  exit 1
+fi
+
+## 2) build Whonix-Starter (WhonixStarter.exe)
+
+lazbuild -B WhonixStarter.lpr --cpu=x86_64 --os=win64 --compiler=/usr/bin/ppcrossx64
+
+## 3) read values from xml file WhonixStarter.lpi
+
+VERSION=$(xmllint --xpath 'string(//StringTable/@ProductVersion)' WhonixStarter.lpi)
+MANUFACTURE=$(xmllint --xpath 'string(//StringTable/@CompanyName)' WhonixStarter.lpi)
+DESCRIPTION=$(xmllint --xpath 'string(//StringTable/@Comments)' WhonixStarter.lpi)
+
+## 4) build msi package for Whonix-Starter
+
+wixl \
+  --verbose \
+  --arch x64 \
+  --define whonixStarterVersion="$VERSION" \
+  --define whonixStarterManufacturer="$MANUFACTURE" \
+  --define whonixStarterDescription="$DESCRIPTION" \
+  --output WhonixStarterSetup.msi \
+  WhonixStarterSetup.wxs
+  
+## Debugging.
+du -sh WhonixStarterSetup.msi
+
+true "$0: SUCCESS"
