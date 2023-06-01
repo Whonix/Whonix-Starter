@@ -25,21 +25,30 @@ unit WhonixUtils;
 interface
 
 uses
-  {$IFDEF WINDOWS}
-    Windows, ShellApi,
-  {$ENDIF}
+  Classes, SysUtils, FileUtil, Forms, Process, Math;
 
-  Classes, SysUtils, Forms, Process, FileUtil;
-
+function AppDiskGetFreeSpace(const fn: string): Int64;
 procedure EnsureValidExePath(var TargetPath: string; DefaultPath: string);
-
-{$IFDEF WINDOWS}
-procedure RunAsAdmin(const Handle: Hwnd; const Path, Params: string; Output: TStrings = nil);
-{$ENDIF}
-
 procedure Execute(CommandLine: string; Output: TStrings = nil);
+procedure StreamSaveToFile(Stream: TStream; FileName: String);
+procedure CopyUnblocked(FromStream, ToStream: TStream);
 
 implementation
+
+function AppDiskGetFreeSpace(const fn: string): Int64;
+begin
+  {$ifdef linux}
+  //this crashes on FreeBSD 12 x64
+  exit(SysUtils.DiskFree(SysUtils.AddDisk(ExtractFileDir(fn))));
+  {$endif}
+
+  {$ifdef windows}
+  exit(SysUtils.DiskFree(SysUtils.GetDriveIDFromLetter(ExtractFileDrive(fn))));
+  {$endif}
+
+  //cannot detect
+  exit(-1);
+end;
 
 procedure EnsureValidExePath(var TargetPath: string; DefaultPath: string);
 var
@@ -83,34 +92,6 @@ begin
   sl.Free;
 end;
 
-{$IFDEF WINDOWS}
-procedure RunAsAdmin(const Handle: Hwnd; const Path, Params: string; Output: TStrings = nil);
-var
-  sei: TShellExecuteInfoA;
-begin
-  FillChar(sei, SizeOf(sei), 0);
-  sei.cbSize := SizeOf(sei);
-  sei.Wnd := 0; // Handle
-  sei.fMask := SEE_MASK_NOCLOSEPROCESS;
-  sei.lpVerb := 'runas';
-  sei.lpFile := PAnsiChar(Path);
-  sei.lpParameters := PAnsiChar(Params);
-  sei.nShow := SW_SHOW;
-  sei.hInstApp := 0;
-
-  if Output <> nil then begin
-    Output.Append('Execute: ' + sei.lpFile + ' ' + sei.lpParameters);
-  end;
-
-  if ShellExecuteExA(@sei) then begin
-    while WaitForSingleObject(sei.hProcess, 10) <> 0 do begin
-      Application.ProcessMessages;
-    end;
-    CloseHandle(sei.hProcess);
-  end;
-end;
-{$ENDIF}
-
 procedure Execute(CommandLine: string; Output: TStrings = nil);
 const
   BUFSIZE = 2048;
@@ -118,6 +99,7 @@ var
   Process: TProcess;
   StrStream: TStringStream;
   BytesRead: longint;
+  Running: boolean;
   Buffer: array[1..BUFSIZE] of byte;
 begin
   Process := TProcess.Create(nil);
@@ -136,15 +118,17 @@ begin
 
   try
     repeat
-      Sleep(10);
+      Sleep(100);
       Application.ProcessMessages;
 
-      if (Process.Output.NumBytesAvailable > BUFSIZE) or not Process.Running then
+      Running := Process.Running;
+      BytesRead := Min(BUFSIZE, Process.Output.NumBytesAvailable);
+      if BytesRead > 0 then
       begin
-        BytesRead := Process.Output.Read(Buffer, BUFSIZE);
+        BytesRead := Process.Output.Read(Buffer, BytesRead);
         StrStream.Write(Buffer, BytesRead);
       end;
-    until (BytesRead = 0) and not Process.Running;
+    until (BytesRead = 0) and not Running;
   except
     on E: Exception do
       if Output <> nil then
@@ -165,6 +149,28 @@ begin
 
   StrStream.Free;
   Process.Free;
+end;
+
+procedure StreamSaveToFile(Stream: TStream; FileName: String);
+var
+  FileStream: TFileStream;
+begin
+  FileStream := TFileStream.Create(FileName, fmCreate);
+  try
+    CopyUnblocked(Stream, FileStream);
+  finally
+    FileStream.Free;
+  end;
+end;
+
+procedure CopyUnblocked(FromStream, ToStream: TStream);
+begin
+  while FromStream.Position + 1024 * 1024 < FromStream.Size do
+  begin
+    ToStream.CopyFrom(FromStream, 1024 * 1024);
+    Application.ProcessMessages;
+  end;
+  ToStream.CopyFrom(FromStream, FromStream.Size - FromStream.Position);
 end;
 
 end.

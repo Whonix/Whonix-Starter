@@ -20,25 +20,23 @@ if ! [ -x "$(command -v lazbuild)" ]; then
   exit 1
 fi
 
-## 2) build whonix starter (Whonix.exe)
+## 2) build whonix starter (WhonixStarter.exe)
 
-lazbuild -B Whonix.lpr --cpu=x86_64 --os=win64 --compiler=/usr/bin/ppcrossx64
+lazbuild -B WhonixStarter.lpr --cpu=x86_64 --os=win64 --compiler=/usr/bin/ppcrossx64
 
-## 3) read values from xml file Whonix.lpi
+## 3) read values from xml file WhonixStarter.lpi
 
-VERSION=$(xmllint --xpath 'string(//StringTable/@ProductVersion)' Whonix.lpi)
-MANUFACTURE=$(xmllint --xpath 'string(//StringTable/@CompanyName)' Whonix.lpi)
-DESCRIPTION=$(xmllint --xpath 'string(//StringTable/@Comments)' Whonix.lpi)
-FILE_WHONIX_EXE=$(xmllint --xpath 'string(//StringTable/@OriginalFilename)' Whonix.lpi)
+VERSION=$(xmllint --xpath 'string(//StringTable/@ProductVersion)' WhonixStarter.lpi)
+MANUFACTURE=$(xmllint --xpath 'string(//StringTable/@CompanyName)' WhonixStarter.lpi)
+DESCRIPTION=$(xmllint --xpath 'string(//StringTable/@Comments)' WhonixStarter.lpi)
 
 ## 4) build msi package for whonix starter
 
 wixl \
   --verbose \
   --arch x64 \
-  --define whonixVersion="$VERSION" \
-  --define whonixManufacturer="$MANUFACTURE" \
-  --define whonixDescription="$DESCRIPTION" \
-  --define whonixFileMainExe="$FILE_WHONIX_EXE" \
+  --define whonixStarterVersion="$VERSION" \
+  --define whonixStarterManufacturer="$MANUFACTURE" \
+  --define whonixStarterDescription="$DESCRIPTION" \
   --output WhonixStarterSetup.msi \
-  Setup.wxs
+  WhonixStarterSetup.wxs
