@@ -85,11 +85,11 @@ begin
   begin
     ProcessA := TProcess.Create(nil);
     ProcessA.CommandLine := AppConfig.VBoxManagePath +
-      ' startvm Whonix-Workstation-XFCE';
+      ' startvm Whonix-Workstation-Xfce';
     ProcessA.Execute;
     ProcessB := TProcess.Create(nil);
     ProcessB.CommandLine := AppConfig.VBoxManagePath +
-      ' startvm Whonix-Gateway-XFCE';
+      ' startvm Whonix-Gateway-Xfce';
     ProcessB.Execute;
     ButtonStartStop.Caption := 'Stop Whonix';
   end
@@ -98,11 +98,11 @@ begin
   begin
     ProcessA := TProcess.Create(nil);
     ProcessA.CommandLine := AppConfig.VBoxManagePath +
-      ' controlvm Whonix-Workstation-XFCE poweroff';
+      ' controlvm Whonix-Workstation-Xfce poweroff';
     ProcessA.Execute;
     ProcessB := TProcess.Create(nil);
     ProcessB.CommandLine := AppConfig.VBoxManagePath +
-      ' controlvm Whonix-Gateway-XFCE poweroff';
+      ' controlvm Whonix-Gateway-Xfce poweroff';
     ProcessB.Execute;
     ButtonStartStop.Caption := 'Start Whonix';
   end;
