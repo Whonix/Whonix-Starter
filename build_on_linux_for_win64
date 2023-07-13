@@ -47,8 +47,10 @@ wixl \
   --define whonixStarterDescription="$DESCRIPTION" \
   --output WhonixStarterSetup.msi \
   WhonixStarterSetup.wxs
-  
+
 ## Debugging.
+ls -la WhonixStarterSetup.msi
 du -sh WhonixStarterSetup.msi
+mimetype WhonixStarterSetup.msi
 
 true "$0: SUCCESS"
