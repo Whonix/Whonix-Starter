@@ -29,10 +29,15 @@ fi
 
 ## 2) build Whonix-Starter (WhonixStarter.exe)
 
-## Was functional.
+## Was functional without build dependency packages from Debian trixie.
 #lazbuild -B WhonixStarter.lpr --cpu=x86_64 --os=win64 --compiler=/usr/bin/ppcrossx64
 
-## Requires packages from Debian trixie: fp-units-win-base fp-units-win-rtl fp-units-win-fcl fp-units-win-misc
+## lazbuild requires build dependency packages from Debian trixie.
+dpkg -l | grep fp-units-win-base >/dev/null
+dpkg -l | grep fp-units-win-rtl >/dev/null
+dpkg -l | grep fp-units-win-fcl >/dev/null
+dpkg -l | grep fp-units-win-misc >/dev/null
+
 lazbuild -B WhonixStarter.lpr --cpu=x86_64 --os=win64
 
 ## 3) read values from xml file WhonixStarter.lpi
