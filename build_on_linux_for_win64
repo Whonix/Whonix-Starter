@@ -54,12 +54,12 @@ wixl \
   --define whonixStarterVersion="$VERSION" \
   --define whonixStarterManufacturer="$MANUFACTURE" \
   --define whonixStarterDescription="$DESCRIPTION" \
-  --output WhonixStarterSetup.msi \
-  WhonixStarterSetup.wxs
+  --output WhonixStarterInstaller.msi \
+  WhonixStarterInstaller.wxs
 
 ## Debugging.
-ls -la WhonixStarterSetup.msi
-du -sh WhonixStarterSetup.msi
-mimetype WhonixStarterSetup.msi
+ls -la WhonixStarterInstaller.msi
+du -sh WhonixStarterInstaller.msi
+mimetype WhonixStarterInstaller.msi
 
 true "$0: SUCCESS"
