@@ -12,24 +12,24 @@ true "$0: START"
 
 ## 1) sanity tests
 
-if ! [ -x "$(command -v wixl)" ]; then
-  echo "$0: ERROR: wixl is not installed." >&2
-  exit 1
-fi
-
-if ! [ -x "$(command -v xmllint)" ]; then
-  echo "$0: ERROR: xmllint is not installed." >&2
-  exit 1
-fi
-
-if ! [ -x "$(command -v lazbuild)" ]; then
-  echo "$0: ERROR: lazbuild is not installed." >&2
-  exit 1
-fi
+command -v wixl >/dev/null
+command -v xmllint >/dev/null
+command -v lazbuild >/dev/null
+## from package libfile-mimeinfo-perl
+command -v mimetype >/dev/null
 
 ## 2) build Whonix-Starter (WhonixStarter.exe)
 
-lazbuild -B WhonixStarter.lpr --cpu=x86_64 --os=win64 --compiler=/usr/bin/ppcrossx64
+## Was functional without build dependency packages from Debian trixie.
+#lazbuild -B WhonixStarter.lpr --cpu=x86_64 --os=win64 --compiler=/usr/bin/ppcrossx64
+
+## lazbuild requires build dependency packages from Debian trixie.
+dpkg -l | grep fp-units-win-base >/dev/null
+dpkg -l | grep fp-units-win-rtl >/dev/null
+dpkg -l | grep fp-units-win-fcl >/dev/null
+dpkg -l | grep fp-units-win-misc >/dev/null
+
+lazbuild -B WhonixStarter.lpr --cpu=x86_64 --os=win64
 
 ## 3) read values from xml file WhonixStarter.lpi
 
@@ -45,10 +45,13 @@ wixl \
   --define whonixStarterVersion="$VERSION" \
   --define whonixStarterManufacturer="$MANUFACTURE" \
   --define whonixStarterDescription="$DESCRIPTION" \
-  --output WhonixStarterSetup.msi \
-  WhonixStarterSetup.wxs
-  
+  --output WhonixStarterInstaller.msi \
+  WhonixStarterInstaller.wxs
+
 ## Debugging.
-du -sh WhonixStarterSetup.msi
+ls -la WhonixStarterInstaller.msi
+du -sh WhonixStarterInstaller.msi
+mimetype WhonixStarterInstaller.msi
+
 
 true "$0: SUCCESS"

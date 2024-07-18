@@ -3,19 +3,7 @@
  *
  * Copyright: 2012 - 2023 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
  * Author: einsiedler90@protonmail.com
- * License: GPL-3+-with-additional-terms-1
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * .
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * .
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * License: See the file COPYING for copying conditions.
  *)
 
 unit WhonixStarter_Main;
@@ -85,11 +73,11 @@ begin
   begin
     ProcessA := TProcess.Create(nil);
     ProcessA.CommandLine := AppConfig.VBoxManagePath +
-      ' startvm Whonix-Workstation-XFCE';
+      ' startvm Whonix-Workstation-Xfce';
     ProcessA.Execute;
     ProcessB := TProcess.Create(nil);
     ProcessB.CommandLine := AppConfig.VBoxManagePath +
-      ' startvm Whonix-Gateway-XFCE';
+      ' startvm Whonix-Gateway-Xfce';
     ProcessB.Execute;
     ButtonStartStop.Caption := 'Stop Whonix';
   end
@@ -98,11 +86,11 @@ begin
   begin
     ProcessA := TProcess.Create(nil);
     ProcessA.CommandLine := AppConfig.VBoxManagePath +
-      ' controlvm Whonix-Workstation-XFCE poweroff';
+      ' controlvm Whonix-Workstation-Xfce poweroff';
     ProcessA.Execute;
     ProcessB := TProcess.Create(nil);
     ProcessB.CommandLine := AppConfig.VBoxManagePath +
-      ' controlvm Whonix-Gateway-XFCE poweroff';
+      ' controlvm Whonix-Gateway-Xfce poweroff';
     ProcessB.Execute;
     ButtonStartStop.Caption := 'Start Whonix';
   end;
