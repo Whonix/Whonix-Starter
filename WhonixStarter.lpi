@@ -17,7 +17,7 @@
       <UseVersionInfo Value="True"/>
       <MajorVersionNr Value="2"/>
       <Attributes pvaDebug="True"/>
-      <StringTable Comments="Whonix Starter Application" CompanyName="ENCRYPTED SUPPORT LP" FileDescription="Whonix Starter Executable" InternalName="WhonixStarter" LegalCopyright="Copyright (C) 2022" OriginalFilename="WhonixStarter.exe" ProductName="Whonix Starter" ProductVersion="2.0.0"/>
+      <StringTable Comments="Whonix Starter Application" CompanyName="ENCRYPTED SUPPORT LLC" FileDescription="Whonix Starter Executable" InternalName="WhonixStarter" LegalCopyright="Copyright (C) 2022" OriginalFilename="WhonixStarter.exe" ProductName="Whonix Starter" ProductVersion="2.0.0"/>
     </VersionInfo>
     <BuildModes>
       <Item Name="Default" Default="True"/>
