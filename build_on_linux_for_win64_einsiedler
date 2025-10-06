@@ -21,9 +21,9 @@ command -v mimetype >/dev/null
 ## 2) build Whonix-Starter (WhonixStarter.exe)
 
 ## Was functional without build dependency packages from Debian trixie.
-#lazbuild -B WhonixStarter.lpr --cpu=x86_64 --os=win64 --compiler=/usr/bin/ppcrossx64
+#lazbuild --lazarusdir=/usr/lib/lazarus/4.0 -B WhonixStarter.lpr --cpu=x86_64 --os=win64 --compiler=/usr/bin/ppcrossx64
 
-lazbuild -B WhonixStarter.lpr --cpu=x86_64 --os=win64
+lazbuild --lazarusdir=/usr/lib/lazarus/4.0 -B WhonixStarter.lpr --cpu=x86_64 --os=win64
 
 ## 3) read values from xml file WhonixStarter.lpi
 
