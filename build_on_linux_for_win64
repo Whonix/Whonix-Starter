@@ -1,57 +1,69 @@
 #!/bin/bash
 
-## Copyright (C) 2023 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
+## Copyright (C) 2026 - 2026 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
-set -x
-set -e
-set -o pipefail
+set -o errexit
 set -o nounset
+set -o errtrace
+set -o pipefail
 
-true "$0: START"
+source /usr/libexec/helper-scripts/has.sh
+source /usr/libexec/helper-scripts/log_run_die.sh
+source /usr/libexec/helper-scripts/package_installed_check.sh
+source /usr/libexec/helper-scripts/check_runtime.bsh
 
-## 1) sanity tests
+if was_sourced "${BASH_SOURCE[0]}"; then
+  die 1 "Do not source this script!"
+fi
 
-command -v wixl >/dev/null
-command -v xmllint >/dev/null
-command -v lazbuild >/dev/null
-## from package libfile-mimeinfo-perl
-command -v mimetype >/dev/null
+MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-## 2) build Whonix-Starter (WhonixStarter.exe)
+build_whonix_starter() {
+  local dep_command_list dep_command_pkg_list dep_pkg_list idx dep_pkg \
+    whonix_starter_version
 
-## Was functional without build dependency packages from Debian trixie.
-#lazbuild --lazarusdir=/usr/lib/lazarus/4.0 -B WhonixStarter.lpr --cpu=x86_64 --os=win64 --compiler=/usr/bin/ppcrossx64
+  dep_command_list=( 'makensis' 'lazbuild' 'xmllint' )
+  dep_command_pkg_list=( 'nsis' 'lazarus-ide' 'libxml2-utils' )
+  dep_pkg_list=(
+    'fp-units-win-base'
+    'fp-units-win-rtl'
+    'fp-units-win-fcl'
+    'fp-units-win-misc'
+  )
 
-## lazbuild requires build dependency packages from Debian trixie.
-dpkg -l | grep fp-units-win-base >/dev/null
-dpkg -l | grep fp-units-win-rtl >/dev/null
-dpkg -l | grep fp-units-win-fcl >/dev/null
-dpkg -l | grep fp-units-win-misc >/dev/null
+  for idx in "${!dep_command_list[@]}"; do
+    if ! has "${dep_command_list[idx]}"; then
+      die 1 "Cannot find command '${dep_command_list[idx]}'! Is the '${dep_command_pkg_list[idx]}' package installed?"
+    fi
+  done
+  for dep_pkg in "${dep_pkg_list[@]}"; do
+    if ! pkg_installed "${dep_pkg}"; then
+      die 1 "Package '${dep_pkg}' is not installed!"
+    fi
+  done
 
-lazbuild --lazarusdir=/usr/lib/lazarus/4.0 -B WhonixStarter.lpr --cpu=x86_64 --os=win64
+  log notice 'Getting Whonix-Starter version...'
+  log notice "Command executing: $ xmllint --xpath string(//VersionInfo/StringTable/@ProductVersion) ${MYDIR}/WhonixStarter.lpi"
+  whonix_starter_version="$(xmllint --xpath 'string(//VersionInfo/StringTable/@ProductVersion)' "${MYDIR}/WhonixStarter.lpi")"
+  log notice "Detected Whonix-Starter version '${whonix_starter_version}'."
 
-## 3) read values from xml file WhonixStarter.lpi
+  log notice 'Building Whonix-Starter for Windows...'
+  log_run notice lazbuild \
+    --lazarusdir=/usr/lib/lazarus/4.0 \
+    -B \
+    "${MYDIR}/WhonixStarter.lpi" \
+    --cpu=x86_64 \
+    --os=win64
+  log notice 'Whonix-Starter for Windows build.'
 
-VERSION=$(xmllint --xpath 'string(//StringTable/@ProductVersion)' WhonixStarter.lpi)
-MANUFACTURE=$(xmllint --xpath 'string(//StringTable/@CompanyName)' WhonixStarter.lpi)
-DESCRIPTION=$(xmllint --xpath 'string(//StringTable/@Comments)' WhonixStarter.lpi)
+  log notice 'Building NSIS installer for Whonix-Starter...'
+  log_run notice makensis \
+    -DVersion="${whonix_starter_version}" \
+    -V4 \
+    -WX \
+    "${MYDIR}/WhonixStarter.nsi" 
+  log notice 'NSIS installer for Whonix-Starter built.'
+}
 
-## 4) build msi package for Whonix-Starter
-
-wixl \
-  --verbose \
-  --arch x64 \
-  --define whonixStarterVersion="$VERSION" \
-  --define whonixStarterManufacturer="$MANUFACTURE" \
-  --define whonixStarterDescription="$DESCRIPTION" \
-  --output WhonixStarterInstaller.msi \
-  WhonixStarterInstaller.wxs
-
-## Debugging.
-ls -la WhonixStarterInstaller.msi
-du -sh WhonixStarterInstaller.msi
-mimetype WhonixStarterInstaller.msi
-
-
-true "$0: SUCCESS"
+build_whonix_starter

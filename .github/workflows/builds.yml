@@ -24,7 +24,7 @@ jobs:
             - name: System Basic Packages
               run: |
                   apt-get update
-                  apt-get install --yes --no-install-recommends adduser shellcheck libxml2-utils wixl fpc lazarus git ca-certificates libfile-mimeinfo-perl
+                  apt-get install --yes --no-install-recommends adduser shellcheck libxml2-utils nsis fpc lazarus git ca-certificates libfile-mimeinfo-perl
             - name: Install Packages from Debian trixie
               run: |
                   echo 'Types: deb' | tee /etc/apt/sources.list.d/trixie.sources

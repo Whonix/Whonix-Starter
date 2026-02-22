@@ -1,164 +1,124 @@
-(*
- * Whonix Starter ( whonixutils.pas )
- *
- * Copyright: 2012 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@riseup.net>
- * Author: einsiedler90@protonmail.com
- * License: See the file COPYING for copying conditions.
- *)
+{
+  Copyright: 2026 - 2026 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
+  See the file COPYING for copying conditions.
+}
 
 unit WhonixUtils;
 
 {$mode ObjFPC}{$H+}
+{$ZeroBasedStrings On}
 
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Process, Math;
+  Classes, SysUtils, Process;
 
-function AppDiskGetFreeSpace(const fn: string): Int64;
-procedure EnsureValidExePath(var TargetPath: string; DefaultPath: string);
-procedure Execute(CommandLine: string; Output: TStrings = nil);
-procedure StreamSaveToFile(Stream: TStream; FileName: String);
-procedure CopyUnblocked(FromStream, ToStream: TStream);
+function VMNameFromLine(VMLine: String) : String;
+function RunCaptureCommand(ProgramName: String;
+  Parameters: array of String; out CmdResult: String): Boolean;
 
 implementation
 
-function AppDiskGetFreeSpace(const fn: string): Int64;
-begin
-  {$ifdef linux}
-  //this crashes on FreeBSD 12 x64
-  exit(SysUtils.DiskFree(SysUtils.AddDisk(ExtractFileDir(fn))));
-  {$endif}
-
-  {$ifdef windows}
-  exit(SysUtils.DiskFree(SysUtils.GetDriveIDFromLetter(ExtractFileDrive(fn))));
-  {$endif}
-
-  //cannot detect
-  exit(-1);
-end;
-
-procedure EnsureValidExePath(var TargetPath: string; DefaultPath: string);
+function VMNameFromLine(VMLine: String) : String;
 var
-  filename: string;
-  sl: TStringList;
+  LineIndex: Integer;
+  EndSpaceIndex: Integer;
 begin
-  if FileExists(TargetPath) then
+  EndSpaceIndex := -1;
+  for LineIndex := 0 to Length(VMLine) - 1 do
   begin
-    Exit;
-  end;
-
-  if (TargetPath <> DefaultPath) and FileExists(DefaultPath) then
-  begin
-    TargetPath := DefaultPath;
-    Exit;
-  end;
-
-  filename := ExtractFileName(DefaultPath);
-  TargetPath := FindDefaultExecutablePath(filename);
-  if FileExists(TargetPath) then
-  begin
-    Exit;
-  end;
-
-  sl := TStringList.Create;
-  {$IFDEF WINDOWS}
-  Execute('where /r C:\ ' + filename, sl);
-  {$ELSE}
-  Execute('which ' + filename, sl);
-  {$ENDIF}
-
-  if (sl.Count > 0) and FileExists(sl.Strings[0]) then
-  begin
-    TargetPath := sl.Strings[0];
-  end
-  else
-  begin
-    TargetPath := '';
-  end;
-
-  sl.Free;
-end;
-
-procedure Execute(CommandLine: string; Output: TStrings = nil);
-const
-  BUFSIZE = 2048;
-var
-  Process: TProcess;
-  StrStream: TStringStream;
-  BytesRead: longint;
-  Running: boolean;
-  Buffer: array[1..BUFSIZE] of byte;
-begin
-  Process := TProcess.Create(nil);
-  Process.CommandLine := CommandLine;
-  Process.Options := Process.Options + [poNoConsole];
-
-  if Output <> nil then
-  begin
-    Process.Options := Process.Options + [poUsePipes, poStderrToOutPut];
-    Output.Append('Execute: ' + Process.CommandLine);
-  end;
-
-  Process.Execute;
-
-  StrStream := TStringStream.Create;
-
-  try
-    repeat
-      Sleep(100);
-      Application.ProcessMessages;
-
-      Running := Process.Running;
-      BytesRead := Min(BUFSIZE, Process.Output.NumBytesAvailable);
-      if BytesRead > 0 then
-      begin
-        BytesRead := Process.Output.Read(Buffer, BytesRead);
-        StrStream.Write(Buffer, BytesRead);
-      end;
-    until (BytesRead = 0) and not Running;
-  except
-    on E: Exception do
-      if Output <> nil then
-      begin
-        Output.Append('Exception: ' + E.Message);
-      end;
-  end;
-
-  if Output <> nil then
-  begin
-    Output.Append('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-    if StrStream.Size > 0 then
+    if VMLine[LineIndex] = ' ' then
     begin
-      Output.Append(StrStream.DataString);
+      EndSpaceIndex := LineIndex
     end;
-    Output.Append('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
   end;
 
-  StrStream.Free;
-  Process.Free;
-end;
+  {
+    There must be at least three characters before the end space, to accomodate
+    two double quotes and a one-character VM name.
+  }
 
-procedure StreamSaveToFile(Stream: TStream; FileName: String);
-var
-  FileStream: TFileStream;
-begin
-  FileStream := TFileStream.Create(FileName, fmCreate);
-  try
-    CopyUnblocked(Stream, FileStream);
-  finally
-    FileStream.Free;
-  end;
-end;
-
-procedure CopyUnblocked(FromStream, ToStream: TStream);
-begin
-  while FromStream.Position + 1024 * 1024 < FromStream.Size do
+  if EndSpaceIndex < 3 then
   begin
-    ToStream.CopyFrom(FromStream, 1024 * 1024);
-    Application.ProcessMessages;
+    VMNameFromLine := '';
+    Exit;
   end;
-  ToStream.CopyFrom(FromStream, FromStream.Size - FromStream.Position);
+
+  VMNameFromLine := VMLine.Substring(1, EndSpaceIndex - 2);
 end;
+
+{
+  We need to run VBoxManage commands in order to do our job. In a perfect world,
+  we could simply use the RunCommand() function built into Free Pascal to do
+  this. Unfortunately, Free Pascal 3.2.2's RunCommand() function has a bug, and
+  is unable to capture the standard output of an executed application under
+  Windows, although it works fine on Linux. See
+  https://forum.lazarus.freepascal.org/index.php/topic,73508.msg576725.html#msg576725.
+  Debian 13 ships with Free Pascal 3.2.2, so we're stuck with it.
+
+  The other way of doing this is to execute applications asynchronously using
+  TProcess, gather up their output into a stream, and then convert that stream
+  to a string at the end. This solution works quite well under Windows, but on
+  Linux, it inexplicably hangs for multiple seconds before returning, and there
+  doesn't seem to be a straightforward way to prevent this. See
+  https://forum.lazarus.freepascal.org/index.php/topic,73508.msg576725.html#msg576725.
+
+  To make sure both Linux and Windows work, abstract both methods away and use
+  the working method for each platform. Hopefully we can get rid of this kludge
+  once Debian 14 releases.
+}
+
+{$ifdef windows}
+function RunCaptureCommand(ProgramName: String;
+  Parameters: array of String; out CmdResult: String): Boolean;
+type
+  T4KReadBuf = array[0..4095] of Byte;
+var
+  CmdProcess: TProcess;
+  CmdParam: String;
+  CmdReadBuf: T4KReadBuf;
+  CmdReadLen: Integer;
+  CmdOutput: TStringStream;
+begin
+  CmdReadBuf := Default(T4KReadBuf);
+  CmdProcess := TProcess.Create(nil);
+  CmdProcess.Executable := ProgramName;
+  with CmdProcess.Parameters do
+  begin
+    for CmdParam in Parameters do
+    begin
+      Add(CmdParam);
+    end;
+  end;
+  CmdProcess.Options := [poUsePipes, poNoConsole];
+  try
+    CmdProcess.Execute;
+  except
+    CmdProcess.Free;
+    RunCaptureCommand := False;
+    Exit;
+  end;
+
+  CmdOutput := TStringStream.Create;
+  repeat
+    CmdReadLen := CmdProcess.Output.Read(CmdReadBuf, 4096);
+    CmdOutput.Write(CmdReadBuf, CmdReadLen);
+  until CmdReadLen = 0;
+  CmdResult := CmdOutput.DataString;
+
+  if CmdProcess.ExitCode = 0 then RunCaptureCommand := True
+  else RunCaptureCommand := False;
+  CmdProcess.Free;
+  CmdOutput.Free;
+end;
+{$else}
+function RunCaptureCommand(ProgramName: String;
+  Parameters: array of String; out CmdResult: String): Boolean;
+begin
+  RunCaptureCommand := RunCommand(ProgramName, Parameters, CmdResult,
+    [poNoConsole]);
+end;
+{$endif}
 
 end.
+
