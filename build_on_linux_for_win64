@@ -62,7 +62,7 @@ build_whonix_starter() {
     -DVersion="${whonix_starter_version}" \
     -V4 \
     -WX \
-    "${MYDIR}/WhonixStarter.nsi" 
+    "${MYDIR}/WhonixStarter.nsi"
   log notice 'NSIS installer for Whonix-Starter built.'
 }
 
