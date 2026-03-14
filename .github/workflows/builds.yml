@@ -24,7 +24,7 @@ jobs:
             - name: System Basic Packages
               run: |
                   apt-get update
-                  apt-get install --yes --no-install-recommends adduser shellcheck libxml2-utils wixl fpc lazarus git ca-certificates libfile-mimeinfo-perl
+                  apt-get install --yes --no-install-recommends adduser shellcheck libxml2-utils nsis fpc lazarus git ca-certificates libfile-mimeinfo-perl wget
             - name: Install Packages from Debian trixie
               run: |
                   echo 'Types: deb' | tee /etc/apt/sources.list.d/trixie.sources
@@ -32,8 +32,15 @@ jobs:
                   echo 'Suites: trixie' | tee -a /etc/apt/sources.list.d/trixie.sources
                   echo 'Components: main' | tee -a /etc/apt/sources.list.d/trixie.sources
                   echo 'Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg' | tee -a /etc/apt/sources.list.d/trixie.sources
+                  echo 'Types: deb' | tee /etc/apt/sources.list.d/derivative.sources
+                  echo 'URIs: https://deb.kicksecure.com' | tee -a /etc/apt/sources.list.d/derivative.sources
+                  echo 'Suites: trixie' | tee -a /etc/apt/sources.list.d/derivative.sources
+                  echo 'Components: main contrib non-free' | tee -a /etc/apt/sources.list.d/derivative.sources
+                  echo 'Enabled: yes' | tee -a /etc/apt/sources.list.d/derivative.sources
+                  echo 'Signed-By: /usr/share/keyrings/derivative.asc' | tee -a /etc/apt/sources.list.d/derivative.sources
+                  wget -O /usr/share/keyrings/derivative.asc 'https://www.kicksecure.com/keys/derivative.asc'
                   apt-get update
-                  apt-get install --yes --no-install-recommends fp-units-win-base fp-units-win-rtl fp-units-win-fcl fp-units-win-misc
+                  apt-get install --yes --no-install-recommends fp-units-win-base fp-units-win-rtl fp-units-win-fcl fp-units-win-misc helper-scripts
             - name: System information
               run: |
                   whoami
@@ -49,6 +56,6 @@ jobs:
             - name: Build Starter
               run: su -s /bin/bash user -- ./build_on_linux_for_win64
             - name: ShellCheck
-              run: shellcheck ./build_on_linux_for_win64
+              run: shellcheck -x ./build_on_linux_for_win64
 
 # vim: sw=4

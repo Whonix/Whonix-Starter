@@ -1,37 +1,92 @@
-object MainForm: TMainForm
-  Left = 134
-  Height = 600
-  Top = 60
-  Width = 600
-  Caption = 'Whonix Starter'
-  ClientHeight = 600
-  ClientWidth = 600
-  OnCreate = FormCreate
-  LCLVersion = '2.2.4.0'
-  object ButtonAdvanced: TButton
+object WhonixStarterForm: TWhonixStarterForm
+  Left = 342
+  Height = 186
+  Top = 32
+  Width = 410
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
+  Caption = 'Whonix-Starter'
+  ClientHeight = 186
+  ClientWidth = 410
+  object ActionGroupBox: TGroupBox
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = InfoStatusBar
     Left = 10
-    Height = 100
-    Top = 490
-    Width = 580
-    Align = alBottom
-    BorderSpacing.Around = 10
-    Caption = 'Advanced'
-    Font.Height = -48
-    OnClick = ButtonAdvancedClick
-    ParentFont = False
-    TabOrder = 1
-  end
-  object ButtonStartStop: TButton
-    Left = 10
-    Height = 470
+    Height = 142
     Top = 10
-    Width = 580
-    Align = alClient
+    Width = 390
+    Align = alTop
+    Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Around = 10
-    Caption = 'Start Whonix'
-    Font.Height = -64
-    OnClick = ButtonStartStopClick
-    ParentFont = False
+    Caption = 'Actions'
+    ChildSizing.VerticalSpacing = 10
+    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+    ChildSizing.EnlargeVertical = crsHomogenousChildResize
+    ChildSizing.Layout = cclLeftToRightThenTopToBottom
+    ChildSizing.ControlsPerLine = 1
+    ClientHeight = 118
+    ClientWidth = 384
     TabOrder = 0
+    object StartStopGroupPanel: TPanel
+      Left = 0
+      Height = 55
+      Top = 0
+      Width = 384
+      BevelColor = clForm
+      ChildSizing.HorizontalSpacing = 10
+      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+      ChildSizing.EnlargeVertical = crsHomogenousChildResize
+      ChildSizing.Layout = cclLeftToRightThenTopToBottom
+      ChildSizing.ControlsPerLine = 2
+      ClientHeight = 55
+      ClientWidth = 384
+      Color = clForm
+      ParentBackground = False
+      ParentColor = False
+      TabOrder = 0
+      object StartWhonixButton: TButton
+        Left = 1
+        Height = 53
+        Top = 1
+        Width = 187
+        Caption = 'Start Whonix'
+        TabOrder = 0
+        OnClick = StartWhonixButtonClick
+      end
+      object StopWhonixButton: TButton
+        Left = 198
+        Height = 53
+        Top = 1
+        Width = 185
+        Caption = 'Stop Whonix'
+        TabOrder = 1
+        OnClick = StopWhonixButtonClick
+      end
+    end
+    object LaunchVBoxButton: TButton
+      Left = 0
+      Height = 53
+      Top = 65
+      Width = 384
+      Caption = 'Launch VirtualBox Manager'
+      TabOrder = 1
+      OnClick = LaunchVBoxButtonClick
+    end
+  end
+  object InfoStatusBar: TStatusBar
+    Left = 0
+    Height = 24
+    Top = 162
+    Width = 410
+    Anchors = [akBottom]
+    Constraints.MaxHeight = 24
+    Constraints.MinHeight = 24
+    Panels = <>
+    SimpleText = 'Ready.'
+    SizeGrip = False
+    OnDblClick = InfoStatusBarDblClick
   end
 end

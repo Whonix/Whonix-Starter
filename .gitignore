@@ -1,10 +1,6 @@
 # special files
-WhonixStarter
-license.txt
-Whonix.ova
-vbox.exe
-*.msi
-
+Whonix-Starter
+*.ova
 
 # Lazarus compiler-generated binaries (safe to delete)
 *.exe
