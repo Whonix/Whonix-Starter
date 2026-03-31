@@ -55,7 +55,7 @@ build_whonix_starter() {
     "${MYDIR}/WhonixStarter.lpi" \
     --cpu=x86_64 \
     --os=win64
-  log notice 'Whonix-Starter for Windows build.'
+  log notice 'Whonix-Starter for Windows built.'
 
   log notice 'Building NSIS installer for Whonix-Starter...'
   log_run notice makensis \
