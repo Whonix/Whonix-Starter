@@ -1,0 +1,119 @@
+#!/bin/bash
+
+## Copyright (C) 2026 - 2026 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
+## See the file COPYING for copying conditions.
+
+## Shared core for the build system. The frontend scripts simply call this
+## script with varying command-line options.
+
+set -o errexit
+set -o nounset
+set -o errtrace
+set -o pipefail
+
+source /usr/libexec/helper-scripts/has.sh
+source /usr/libexec/helper-scripts/log_run_die.sh
+source /usr/libexec/helper-scripts/package_installed_check.sh
+source /usr/libexec/helper-scripts/check_runtime.bsh
+
+if was_sourced "${BASH_SOURCE[0]}"; then
+  die 1 "Do not source this script!"
+fi
+
+MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+LAZARUS_VERSION='4.0'
+
+build_whonix_starter() {
+  local dep_command_list dep_command_pkg_list dep_pkg_list idx dep_pkg \
+    whonix_starter_version build_mode target_os_name lazbuild_options \
+    built_exec_name
+
+  build_mode="${1:-}"
+  if [ -z "${build_mode}" ]; then
+    log error 'No build mode provided!'
+    exit 1
+  fi
+  if [ "${build_mode}" != '--windows' ] \
+    && [ "${build_mode}" != '--linux' ]; then
+    log error "Build mode is not '--windows' or '--linux'!"
+    exit 1
+  fi
+
+  dep_command_list=( 'lazbuild' )
+  dep_command_pkg_list=( 'lazarus-ide' )
+  dep_pkg_list=()
+  target_os_name=''
+  built_exec_name=''
+
+  if [ "${build_mode}" = '--windows' ]; then
+    target_os_name='Windows'
+    built_exec_name='Whonix-Starter.exe'
+    dep_command_list+=( 'makensis' 'xmllint' )
+    dep_command_pkg_list+=( 'nsis' 'libxml2-utils' )
+    dep_pkg_list+=(
+      'fp-units-win-base'
+      'fp-units-win-rtl'
+      'fp-units-win-fcl'
+      'fp-units-win-misc'
+    )
+  else # "${build_mode}" = '--linux'
+    target_os_name='Linux'
+    built_exec_name='Whonix-Starter'
+  fi
+
+  for idx in "${!dep_command_list[@]}"; do
+    if ! has "${dep_command_list[idx]}"; then
+      die 1 "Cannot find command '${dep_command_list[idx]}'! Is the '${dep_command_pkg_list[idx]}' package installed?"
+    fi
+  done
+  for dep_pkg in "${dep_pkg_list[@]}"; do
+    if ! pkg_installed "${dep_pkg}"; then
+      die 1 "Package '${dep_pkg}' is not installed!"
+    fi
+  done
+
+  lazbuild_options=(
+    "--lazarusdir=/usr/lib/lazarus/${LAZARUS_VERSION}"
+    '--build-all'
+    "${MYDIR}/WhonixStarter.lpi"
+    '--cpu=x86_64'
+  )
+  if [ "${build_mode}" = '--windows' ]; then
+    lazbuild_options+=( '--os=win64' )
+  else # "${build_mode}" = '--linux'
+    lazbuild_options+=( '--os=linux' '--ws=qt5' )
+  fi
+
+  log notice "Building Whonix-Starter for ${target_os_name}..."
+  log_run notice lazbuild "${lazbuild_options[@]}"
+  if ! [ -f "${MYDIR}/${built_exec_name}" ]; then
+    log error "Build successful, but expected binary '${MYDIR}/${built_exec_name} does not exist!"
+    exit 1
+  fi
+  log notice "Whonix-Starter for ${target_os_name} built."
+
+  if [ "${build_mode}" = '--windows' ]; then
+    log notice 'Getting Whonix-Starter version...'
+    log notice "Command executing: $ xmllint --xpath string(//VersionInfo/StringTable/@ProductVersion) ${MYDIR}/WhonixStarter.lpi"
+    whonix_starter_version="$(xmllint --xpath 'string(//VersionInfo/StringTable/@ProductVersion)' "${MYDIR}/WhonixStarter.lpi")"
+    if [ -z "${whonix_starter_version}" ]; then
+      log error 'Whonix-Starter version detection succeeded, but the version is an empty string!'
+      exit 1
+    fi
+    log notice "Detected Whonix-Starter version '${whonix_starter_version}'."
+
+    log notice 'Building NSIS installer for Whonix-Starter...'
+    log_run notice makensis \
+      -DVersion="${whonix_starter_version}" \
+      -V4 \
+      -WX \
+      "${MYDIR}/WhonixStarter.nsi"
+    if ! [ -f "${MYDIR}/Whonix-Starter-${whonix_starter_version}.exe" ]; then
+      log error "NSIS installer build successful, but expected binary '${MYDIR}/Whonix-Starter-${whonix_starter_version}.exe' does not exist!"
+      exit 1
+    fi
+    log notice 'NSIS installer for Whonix-Starter built.'
+  fi
+}
+
+build_whonix_starter "$@"
