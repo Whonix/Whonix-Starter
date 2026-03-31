@@ -59,6 +59,9 @@ build_whonix_starter() {
   else # "${build_mode}" = '--linux'
     target_os_name='Linux'
     built_exec_name='Whonix-Starter'
+    dep_pkg_list+=(
+      'lcl-qt5'
+    )
   fi
 
   for idx in "${!dep_command_list[@]}"; do
