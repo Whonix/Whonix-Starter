@@ -16,4 +16,4 @@ fi
 
 MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-"${MYDIR}/build_core" --windows
+"${MYDIR}/build_core" --linux
