@@ -57,5 +57,3 @@ jobs:
               run: su -s /bin/bash user -- ./build_on_linux_for_win64
             - name: ShellCheck
               run: shellcheck -x ./build_on_linux_for_win64
-
-# vim: sw=4
