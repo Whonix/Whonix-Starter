@@ -1,6 +1,10 @@
 name: docker build
 on: push
 
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
 jobs:
     build:
         runs-on: ubuntu-22.04
