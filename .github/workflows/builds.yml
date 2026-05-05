@@ -16,6 +16,8 @@ jobs:
         steps:
             - name: Checkout main repository
               uses: actions/checkout@v3
+              with:
+                  persist-credentials: false
             # - name: Checkout developer-meta-files
             #   uses: actions/checkout@v3
             #   with:
