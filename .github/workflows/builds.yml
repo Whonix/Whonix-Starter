@@ -19,11 +19,11 @@ jobs:
 
         steps:
             - name: Checkout main repository
-              uses: actions/checkout@v3
+              uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744  # v3
               with:
                   persist-credentials: false
             # - name: Checkout developer-meta-files
-            #   uses: actions/checkout@v3
+            #   uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744  # v3
             #   with:
             #       repository: Kicksecure/developer-meta-files
             #       path: developer-meta-files
