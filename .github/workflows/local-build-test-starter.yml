@@ -2,8 +2,9 @@ name: docker build
 
 on:
   push:
-    branches: ['*']
+    branches: [master]
   pull_request:
+    branches: [master]
   workflow_dispatch:
 
 permissions:
